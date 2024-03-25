@@ -34,7 +34,10 @@ class ApiService {
       final response = await http
           .post(Uri.parse(url), body: body, headers: header ?? mainHeader)
           .timeout(const Duration(seconds: timeOut));
-      responseJson = handleResponse(response, () {});
+      responseJson = await handleResponse(response, (value) async {
+        var data = await getApi(url, header: header);
+        return data;
+      });
       print(response.body);
 
       // }
@@ -74,8 +77,8 @@ class ApiService {
           .timeout(const Duration(seconds: timeOut));
 
       responseJson = await handleResponse(response, (value) async {
-        var aa = await getApi(url, header: header);
-        return aa;
+        var data = await getApi(url, header: header);
+        return data;
       });
 
       //
@@ -118,7 +121,10 @@ class ApiService {
       final response = await http
           .put(Uri.parse(url), body: body, headers: header ?? mainHeader)
           .timeout(const Duration(seconds: timeOut));
-      responseJson = handleResponse(response, () {});
+      responseJson = await handleResponse(response, (value) async {
+        var data = await getApi(url, header: header);
+        return data;
+      });
     } on SocketException {
       // Utils.toastMessage("please, check your internet connection");
       // Get.toNamed(AppRoutes.noInternet);
@@ -149,12 +155,18 @@ class ApiService {
         final response = await http
             .delete(Uri.parse(url), body: body, headers: header ?? mainHeader)
             .timeout(const Duration(seconds: timeOut));
-        responseJson = handleResponse(response, () {});
+        responseJson = await handleResponse(response, (value) async {
+          var data = await getApi(url, header: header);
+          return data;
+        });
       } else {
         final response = await http
             .delete(Uri.parse(url), headers: header ?? mainHeader)
             .timeout(const Duration(seconds: timeOut));
-        responseJson = handleResponse(response, () {});
+        responseJson = await handleResponse(response, (value) async {
+          var data = await getApi(url, header: header);
+          return data;
+        });
       }
 
       ;
@@ -185,7 +197,6 @@ class ApiService {
           return ApiResponseModel(response.statusCode,
               jsonDecode(response.body)['message'], response.body);
         }
-
       case 400:
         return ApiResponseModel(response.statusCode,
             jsonDecode(response.body)['message'], response.body);
@@ -196,7 +207,6 @@ class ApiService {
         return ApiResponseModel(response.statusCode,
             jsonDecode(response.body)['message'], response.body);
       default:
-        print(response.statusCode);
         return ApiResponseModel(response.statusCode,
             jsonDecode(response.body)['message'], response.body);
     }
