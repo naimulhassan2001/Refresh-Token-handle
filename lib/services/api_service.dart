@@ -26,17 +26,16 @@ class ApiService {
       // 'Accept-Language': PrefsHelper.localizationLanguageCode,
     };
 
-    print("==================================================> url $url");
-    print(
-        "==================================================> url $mainHeader");
 
     try {
       final response = await http
           .post(Uri.parse(url), body: body, headers: header ?? mainHeader)
           .timeout(const Duration(seconds: timeOut));
       responseJson = await handleResponse(response, (value) async {
-        var data = await getApi(url, header: header);
-        return data;
+        if (value) {
+          var data = await getApi(url, header: header);
+          return data;
+        }
       });
       print(response.body);
 
@@ -122,8 +121,10 @@ class ApiService {
           .put(Uri.parse(url), body: body, headers: header ?? mainHeader)
           .timeout(const Duration(seconds: timeOut));
       responseJson = await handleResponse(response, (value) async {
-        var data = await getApi(url, header: header);
-        return data;
+        if (value) {
+          var data = await getApi(url, header: header);
+          return data;
+        }
       });
     } on SocketException {
       // Utils.toastMessage("please, check your internet connection");
@@ -156,20 +157,22 @@ class ApiService {
             .delete(Uri.parse(url), body: body, headers: header ?? mainHeader)
             .timeout(const Duration(seconds: timeOut));
         responseJson = await handleResponse(response, (value) async {
-          var data = await getApi(url, header: header);
-          return data;
+          if (value) {
+            var data = await getApi(url, header: header);
+            return data;
+          }
         });
       } else {
         final response = await http
             .delete(Uri.parse(url), headers: header ?? mainHeader)
             .timeout(const Duration(seconds: timeOut));
         responseJson = await handleResponse(response, (value) async {
-          var data = await getApi(url, header: header);
-          return data;
+          if (value) {
+            var data = await getApi(url, header: header);
+            return data;
+          }
         });
       }
-
-      ;
     } on SocketException {
       // Get.toNamed(AppRoutes.noInternet);
       return ApiResponseModel(503, "No internet connection", '');
@@ -213,7 +216,6 @@ class ApiService {
   }
 
   static Future<String> getRefreshToken() async {
-    dynamic responseJson;
 
     Map<String, String> mainHeader = {
       'Refresh-token': "Refresh-token $refreshToken",
@@ -241,6 +243,5 @@ class ApiService {
       return "";
     }
 
-    return responseJson;
   }
 }
